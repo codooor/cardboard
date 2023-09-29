@@ -1,6 +1,12 @@
-import express from "express";
+import express, { json } from "express";
 import { config } from "dotenv";
 import connectDb from "./config/db.js";
+import cors from "cors";
+
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import typeDefs from "./schema/typedefs.js";
+import resolvers from "./schema/resolvers.js";
 
 // import {
 //   newSport,
@@ -19,7 +25,15 @@ import connectDb from "./config/db.js";
 const app = express();
 config();
 connectDb();
-app.use(express.json());
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+});
+
+await server.start();
+
+app.use("/graphql", cors(), json(), expressMiddleware(server));
 
 // // sport routes
 // app.post("/sport", newSport);
@@ -36,5 +50,5 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5555;
 app.listen(PORT, () => {
-  console.log(`Listening on http://localhost:${PORT}`);
+  console.log(`🚀 Server ready at http://localhost:${PORT}`);
 });
