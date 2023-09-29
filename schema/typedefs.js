@@ -6,19 +6,24 @@ const typeDefs = gql`
     name: String!
   }
 
-  type Variation {
+  type ProductVariation {
+    boxname: String!
+    yearMade: Int!
+  }
+
+  type CardVariation {
     id: ID!
     numbered: Boolean!
     autograph: Boolean!
     color: String!
   }
 
-  type Product {
-    id: ID!
-    productName: String!
-    yearMade: Int!
-    productVariations: [Variation]!
-  }
+  // type Product {
+  //   id: ID!
+  //   productName: String!
+  //   yearMade: Int!
+  //   productVariations: [Variation]!
+  // }
 
   type Brand {
     id: ID!

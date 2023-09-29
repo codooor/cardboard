@@ -7,37 +7,47 @@ const sportSchema = new Schema({
 
 const Sport = mongoose.model("Sport", sportSchema);
 
+const productVariationSchema = new Schema({
+  boxname: String,
+  yearMade: Number,
+});
+
+const ProductVariation = mongoose.model(
+  "ProductVariation",
+  productVariationSchema
+);
+
+// Product Schema
+
+// const productSchema = new Schema({
+//   name: String,
+//   yearMade: Number,
+//   productVariation: [productVariationSchema], // Fixed the reference here
+// });
+
+// const Product = mongoose.model("Product", productSchema);
+
+// Brand Schema
+const brandSchema = new Schema({
+  name: String,
+  variation: [{ type: Schema.Types.ObjectId, ref: "Product Variation" }],
+});
+
+const Brand = mongoose.model("Brand", brandSchema);
+
 // Variation Schema
-const variationSchema = new Schema({
+const cardVariationSchema = new Schema({
   numbered: Boolean,
   autograph: Boolean,
   color: String, // potentially use ENUMS (preferred)
 });
 
-const Variation = mongoose.model("Variation", variationSchema);
-
-// Product Schema
-const productSchema = new Schema({
-  productName: String,
-  yearMade: Number,
-  productVariations: { type: Schema.Types.ObjectId, ref: "Variation" }, // Fixed the reference here
-});
-
-const Product = mongoose.model("Product", productSchema); // Fixed the model name here
-
-// Brand Schema
-const brandSchema = new Schema({
-  name: String,
-  product: { type: Schema.Types.ObjectId, ref: "Product" }, // Fixed the reference here
-  productSport: { type: Schema.Types.ObjectId, ref: "Sport" },
-});
-
-const Brand = mongoose.model("Brand", brandSchema);
+const CardVariation = mongoose.model("CardVariation", cardVariationSchema);
 
 // Card Schema
 const cardSchema = new Schema({
-  brand: { type: Schema.Types.ObjectId, ref: "Brand" },
-  product: { type: Schema.Types.ObjectId, ref: "Product" }, // renamed from productName and fixed the reference
+  brand: [brandSchema],
+  product: [productSchema], // renamed from productName and fixed the reference
   cardNumber: Number,
 });
 
@@ -49,9 +59,9 @@ const playerSchema = new Schema({
   playerNumber: Number,
   playerTeam: String,
   playerPosition: String,
-  playerSport: { type: Schema.Types.ObjectId, ref: "Sport" },
+  playerSport: [sportSchema],
 });
 
 const Player = mongoose.model("Player", playerSchema);
 
-export { Sport, Card, Player, Brand, Variation, Product }; // Added Product to the export
+export { Sport, Card, Player, Brand, CardVariation, ProductVariation }; // Added Product to the export
