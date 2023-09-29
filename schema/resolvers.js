@@ -150,27 +150,27 @@ const resolvers = {
         throw new Error("failed to create new brand");
       }
     },
-    addNewProduct: async (_, { productName, yearMade, varitaionId }, __) => {
-      const newProd = new Product({
-        productName,
-        yearMade,
-        varitaionId,
-      });
+    // addNewProduct: async (_, { productName, yearMade, varitaionId }, __) => {
+    //   const newProd = new Product({
+    //     productName,
+    //     yearMade,
+    //     varitaionId,
+    //   });
 
-      if (!newProd) {
-        throw new Error("no new product");
-      } else {
-        console.log("New product creation success:", newProd);
-      }
+    //   if (!newProd) {
+    //     throw new Error("no new product");
+    //   } else {
+    //     console.log("New product creation success:", newProd);
+    //   }
 
-      try {
-        await newProd.save();
-        return newProd;
-      } catch (err) {
-        console.error(err);
-        throw new Error("failed to create new product");
-      }
-    },
+    //   try {
+    //     await newProd.save();
+    //     return newProd;
+    //   } catch (err) {
+    //     console.error(err);
+    //     throw new Error("failed to create new product");
+    //   }
+    // },
   },
 };
 

@@ -79,8 +79,8 @@ const CardVariation = mongoose.model("CardVariation", cardVariationSchema);
 
 // Card Schema
 const cardSchema = new Schema({
-  brand: [brandSchema],
-  product: [productSchema],
+  brand: { type: String, enum: brand, required: true },
+  product: [productVariationSchema],
   cardNumber: Number,
 });
 

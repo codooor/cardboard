@@ -2,12 +2,14 @@ import gql from "graphql-tag";
 
 const typeDefs = gql`
   enum SportName {
-    "NFL"
-    "College Football"
-    "NBA"
-    "College Basketball"
-    "Major League Baseball"
-    "WNBA"
+    NFL
+    College_Football
+    NBA
+    College_Basketball
+    Major
+    League
+    Baseball
+    WNBA
   }
 
   type Sport {
@@ -16,25 +18,25 @@ const typeDefs = gql`
   }
 
   enum BrandName {
-    "Panini" 
-    "Topps" 
-    "Leaf" 
-    "Bowman"
-   }
+    Panini
+    Topps
+    Leaf
+    Bowman
+  }
 
-   type Brand {
+  type Brand {
     id: ID!
     name: BrandName!
-   }
+  }
 
-   enum Color {
-    "blue"
-    "green"
-    "purple"
-    "tri-color"
-    "cracked ice"
-    "blue shimmer"
-   }
+  enum Color {
+    blue
+    green
+    purple
+    tri_color
+    cracked_ice
+    blue_shimmer
+  }
 
   type ProductVariation {
     boxname: String!
@@ -48,18 +50,10 @@ const typeDefs = gql`
     color: String!
   }
 
-  // type Product {
-  //   id: ID!
-  //   productName: String!
-  //   yearMade: Int!
-  //   productVariations: [Variation]!
-  // }
-
- 
   type Card {
     id: ID!
-    brand: Brand!
-    product: Product!
+    brand: BrandName!
+    product: ProductVariation!
     cardNumber: Int!
   }
 
@@ -80,12 +74,6 @@ const typeDefs = gql`
     getAllBrands: [Brand]
     getBrandById(id: ID!): Brand
 
-    getAllVariations: [Variation]
-    getAllVariationsById(id: ID!): Variation
-
-    getAllProducts: [Product]
-    getProductById(id: ID!): Product
-
     getAllCards: [Card]
     getAllCardsById(id: ID!): Card
 
@@ -98,23 +86,11 @@ const typeDefs = gql`
 
     addNewBrand(name: String!, productId: ID!, sportId: ID!): Brand
 
-    addNewVariation(
-      numbered: Boolean!
-      autograph: Boolean!
-      color: String!
-    ): Variation
-
-    addNewProduct(
-      productName: String!
-      yearMade: Int!
-      variationId: ID!
-    ): Product
-
     addNewCard(brandId: ID!, productId: ID!, cardNumber: Int!): Card
 
     addNewPlayer(
       firstname: String!
-      lastname
+      lastname: String!
       number: Int!
       team: String!
       position: String!
