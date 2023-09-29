@@ -23,7 +23,7 @@ const resolvers = {
     },
     getAllBrands: async () => {
       try {
-        return await Brand.find().populate("Product Variation");
+        return await Brand.find();
       } catch (error) {
         console.error("Error fetching all brands:", error);
         throw error;
@@ -129,11 +129,9 @@ const resolvers = {
     //     throw new Error("Failed to save new sport"); // Throw an error to the client
     //   }
     // },
-    addNewBrand: async (_, { name, productId, sportId }, __) => {
+    addNewBrand: async (_, { name }, __) => {
       const newBrand = new Brand({
         name: name,
-        productId: productId,
-        sportId: sportId,
       });
 
       if (!newBrand) {

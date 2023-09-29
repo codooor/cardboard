@@ -84,7 +84,7 @@ const typeDefs = gql`
   type Mutation {
     addNewSport(name: String!): Sport
 
-    addNewBrand(name: String!, productId: ID!, sportId: ID!): Brand
+    addNewBrand(name: BrandName!): Brand
 
     addNewCard(brandId: ID!, productId: ID!, cardNumber: Int!): Card
 
