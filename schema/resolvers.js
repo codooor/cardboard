@@ -1,4 +1,4 @@
-import { Sport, Brand, Card, Player } from "../models/Cards.js";
+import { Brand, Card, Player, Sport } from "../models/Cards.js";
 
 // CardVariation,
 // ProductVariation,
@@ -109,26 +109,26 @@ const resolvers = {
   },
 
   Mutation: {
-    addNewSport: async (_, { name }, __) => {
-      // Ensure you destructure { name } here
-      const newSport = new Sport({
-        name: name,
-      });
+    // addNewSport: async (_, { name }, __) => {
+    //   // Ensure you destructure { name } here
+    //   const newSport = new Sport({
+    //     name: name,
+    //   });
 
-      if (!newSport) {
-        throw new Error("No Sport Created");
-      } else {
-        console.log("saved:", newSport);
-      }
+    //   if (!newSport) {
+    //     throw new Error("No Sport Created");
+    //   } else {
+    //     console.log("saved:", newSport);
+    //   }
 
-      try {
-        await newSport.save();
-        return newSport; // Return the new Sport instance after it has been saved
-      } catch (error) {
-        console.error(error); // Log any errors
-        throw new Error("Failed to save new sport"); // Throw an error to the client
-      }
-    },
+    //   try {
+    //     await newSport.save();
+    //     return newSport; // Return the new Sport instance after it has been saved
+    //   } catch (error) {
+    //     console.error(error); // Log any errors
+    //     throw new Error("Failed to save new sport"); // Throw an error to the client
+    //   }
+    // },
     addNewBrand: async (_, { name, productId, sportId }, __) => {
       const newBrand = new Brand({
         name: name,

@@ -1,10 +1,40 @@
 import gql from "graphql-tag";
 
 const typeDefs = gql`
+  enum SportName {
+    "NFL"
+    "College Football"
+    "NBA"
+    "College Basketball"
+    "Major League Baseball"
+    "WNBA"
+  }
+
   type Sport {
     id: ID!
-    name: String!
+    name: SportName!
   }
+
+  enum BrandName {
+    "Panini" 
+    "Topps" 
+    "Leaf" 
+    "Bowman"
+   }
+
+   type Brand {
+    id: ID!
+    name: BrandName!
+   }
+
+   enum Color {
+    "blue"
+    "green"
+    "purple"
+    "tri-color"
+    "cracked ice"
+    "blue shimmer"
+   }
 
   type ProductVariation {
     boxname: String!
@@ -25,13 +55,7 @@ const typeDefs = gql`
   //   productVariations: [Variation]!
   // }
 
-  type Brand {
-    id: ID!
-    name: String!
-    products: [Product]!
-    productSports: [Sport]!
-  }
-
+ 
   type Card {
     id: ID!
     brand: Brand!
@@ -41,11 +65,12 @@ const typeDefs = gql`
 
   type Player {
     id: ID!
-    playerName: String!
-    playerNumber: Int!
-    playerTeam: String!
-    playerPosition: String!
-    playerSport: Sport!
+    firstname: String!
+    lastname: String!
+    number: Int!
+    team: String!
+    position: String!
+    sport: Sport!
   }
 
   type Query {
@@ -88,11 +113,12 @@ const typeDefs = gql`
     addNewCard(brandId: ID!, productId: ID!, cardNumber: Int!): Card
 
     addNewPlayer(
-      playerName: String!
-      playerNumber: Int!
-      playerTeam: String!
-      playerPosition: String!
-      sportId: ID!
+      firstname: String!
+      lastname
+      number: Int!
+      team: String!
+      position: String!
+      sport: ID!
     ): Player
   }
 `;
