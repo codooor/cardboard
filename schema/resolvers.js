@@ -1,13 +1,14 @@
 import {
   Brand,
   Card,
-  Player,
+  Athlete,
   Sport,
-  ProductVariation,
+  CardSet,
+  SetVariation,
 } from "../models/Cards.js";
 
-// CardVariation,
-// ProductVariation,
+// CardSet
+// SetVariation
 
 const resolvers = {
   Query: {
@@ -44,8 +45,8 @@ const resolvers = {
           throw new Error(`Failed to fully populate id:${id} with variations`);
         }
 
-        const brandObj = brand.toObject();
-        console.log("Full payload:", JSON.stringify(brandObj, null, 2));
+        // const brandObj = brand.toObject();
+        // console.log("Full payload:", JSON.stringify(brandObj, null, 2));
 
         return brand;
       } catch (error) {
@@ -53,14 +54,14 @@ const resolvers = {
         throw new Error(`Failed to fetch brand name: ${id}.`);
       }
     },
-    // getAllVariations: async () => {
-    //   try {
-    //     return await Variation.find();
-    //   } catch (error) {
-    //     console.error("Error fetching all variations:", error);
-    //     throw new Error("Failed to fetch variations.");
-    //   }
-    // },
+    getAllSetVariation: async () => {
+      try {
+        return await SetVariation.find();
+      } catch (error) {
+        console.error("Error fetching all variations:", error);
+        throw new Error("Failed to fetch variations.");
+      }
+    },
     // getAllVariationsById: async (_, { id }) => {
     //   try {
     //     return await Variation.findById(id);
@@ -98,23 +99,23 @@ const resolvers = {
     },
     getAllCardsById: async (_, { id }) => {
       try {
-        return await Card.findById(id).populate("brand").populate("product");
+        return await Card.findById(id);
       } catch (error) {
         console.error(`Error fetching card with ID ${id}:`, error);
         throw new Error(`Failed to fetch card with ID ${id}.`);
       }
     },
-    getAllPlayers: async () => {
+    getAllAthlete: async () => {
       try {
-        return await Player.find();
+        return await Athlete.find();
       } catch (error) {
         console.error("Error fetching all players:", error);
-        throw new Error("Failed to fetch players.");
+        throw new Error("Failed to fetch athletes.");
       }
     },
-    getAllPlayersById: async (_, { id }) => {
+    getAllAthleteById: async (_, { id }) => {
       try {
-        return await Player.findById(id).populate("playerSport");
+        return await Athlete.findById(id);
       } catch (error) {
         console.error(`Error fetching player with ID ${id}:`, error);
         throw new Error(`Failed to fetch player with ID ${id}.`);
@@ -123,26 +124,26 @@ const resolvers = {
   },
 
   Mutation: {
-    // addNewSport: async (_, { name }, __) => {
-    //   // Ensure you destructure { name } here
-    //   const newSport = new Sport({
-    //     name: name,
-    //   });
+    addNewSport: async (_, { name }, __) => {
+      // Ensure you destructure { name } here
+      const newSport = new Sport({
+        name: name,
+      });
 
-    //   if (!newSport) {
-    //     throw new Error("No Sport Created");
-    //   } else {
-    //     console.log("saved:", newSport);
-    //   }
+      if (!newSport) {
+        throw new Error("No Sport Created");
+      } else {
+        console.log("saved:", newSport);
+      }
 
-    //   try {
-    //     await newSport.save();
-    //     return newSport; // Return the new Sport instance after it has been saved
-    //   } catch (error) {
-    //     console.error(error); // Log any errors
-    //     throw new Error("Failed to save new sport"); // Throw an error to the client
-    //   }
-    // },
+      try {
+        await newSport.save();
+        return newSport; // Return the new Sport instance after it has been saved
+      } catch (error) {
+        console.error(error); // Log any errors
+        throw new Error("Failed to save new sport"); // Throw an error to the client
+      }
+    },
     addNewBrand: async (_, { name }, __) => {
       const newBrand = new Brand({
         name: name,
@@ -162,57 +163,72 @@ const resolvers = {
         throw new Error("failed to create new brand");
       }
     },
-    addNewProductVariation: async (_, { boxname, yearMade, brandId }, __) => {
-      const newVariation = new ProductVariation({
+    addNewSetVariation: async (
+      _,
+      { boxname, year, numbered, autograph, brandId },
+      __
+    ) => {
+      const newSetVariation = new SetVariation({
         boxname,
-        yearMade,
+        year,
+        numbered,
+        autograph,
+        brandId,
       });
 
-      if (!newVariation) {
+      if (!newSetVariation) {
         throw new Error(`Failed to create new variation due to empty fields`);
       }
 
       try {
-        await newVariation.save();
+        await newSetVariation.save();
 
-        const variationData = {
-          boxname: newVariation.boxname,
-          yearMade: newVariation.yearMade,
+        const newSetVariationData = {
+          boxname: newSetVariation.boxname,
+          year: newSetVariation.year,
+          numbered: newSetVariation.numbered,
+          autograph: newSetVariation.autograph,
         };
 
         await Brand.findByIdAndUpdate(
           brandId,
-          { $push: { variation: variationData } },
+          { $push: { variation: newSetVariationData } },
           { new: true, useFindAndModify: false }
         );
 
-        return newVariation;
+        return newSetVariation;
       } catch (err) {
+        if (err.code === 11000) {
+          // MongoDB duplicate key error code
+          throw new Error(
+            "A product variation with this boxname and year already exists"
+          );
+        }
         console.error(err);
         throw new Error("Failed to create a new product variation!");
       }
     },
-    // addNewProduct: async (_, { productName, yearMade, varitaionId }, __) => {
-    //   const newProd = new Product({
-    //     productName,
-    //     yearMade,
-    //     varitaionId,
-    //   });
+    addNewCardSet: async (_, { boxname, year }) => {
+      const newCardSet = new CardSet({
+        boxname,
+        year,
+      });
 
-    //   if (!newProd) {
-    //     throw new Error("no new product");
-    //   } else {
-    //     console.log("New product creation success:", newProd);
-    //   }
+      if (!newCardSet) {
+        throw new Error(`Card set not complete. Fill in all fields`);
+      } else {
+        console.log(`New card set: ${newCardSet} created.`);
+      }
 
-    //   try {
-    //     await newProd.save();
-    //     return newProd;
-    //   } catch (err) {
-    //     console.error(err);
-    //     throw new Error("failed to create new product");
-    //   }
-    // },
+      try {
+        await newCardSet.save();
+
+        return newCardSet;
+      } catch (err) {
+        console.error(err);
+        throw new Error("Card set save unsuccessful.");
+      }
+    },
   },
 };
 

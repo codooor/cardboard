@@ -1,16 +1,25 @@
 import mongoose, { Schema } from "mongoose";
 
-const brand = ["Panini", "Topps", "Leaf", "Bowman"];
-const sports = [
-  "NFL",
-  "College Football",
-  "NBA",
-  "College Basketball",
-  "Major League Baseball",
-  "WNBA",
-];
+/* ******
 
-// Sport Schema
+strong identifiers = strong entity
+weak entity does not have an indetifying attribute
+  -Tasks have taskcodes tasknames durationtimes = no unique attribute
+******* */
+
+// database ENUMS
+const brand = ["Panini", "Topps", "Leaf", "Bowman"];
+const sports = ["NFL", "CFB", "NBA", "MCB", "MLB", "WNBA"];
+// const color = [
+//   "blue",
+//   "green",
+//   "purple",
+//   "tri-color",
+//   "cracked ice",
+//   "blue shimmer",
+// ];
+
+// Sport Schema ********************************
 const sportSchema = new Schema({
   name: {
     type: String,
@@ -20,8 +29,8 @@ const sportSchema = new Schema({
 
 const Sport = mongoose.model("Sport", sportSchema);
 
-// Player Schema
-const playerSchema = new Schema({
+// Player Schema ******************************
+const athleteSchema = new Schema({
   firstname: String,
   lastname: String,
   number: Number,
@@ -30,60 +39,58 @@ const playerSchema = new Schema({
   sport: { type: String, enum: sports, required: true },
 });
 
-const Player = mongoose.model("Player", playerSchema);
+const Athlete = mongoose.model("Athlete", athleteSchema);
 
-const productVariationSchema = new Schema({
-  boxname: String,
-  yearMade: Number,
-});
-
-const ProductVariation = mongoose.model(
-  "ProductVariation",
-  productVariationSchema
-);
-
-// Product Schema
-
-// const productSchema = new Schema({
-//   name: String,
+// ProductVariation *****************************
+// const productVariationSchema = new Schema({
+//   boxname: String,
 //   yearMade: Number,
-//   productVariation: [productVariationSchema], // Fixed the reference here
+//   cardvariant: [cardSetSchema],
 // });
 
-// const Product = mongoose.model("Product", productSchema);
+// ProductVariation index
 
-// Brand Schema
+// const ProductVariation = mongoose.model(
+//   "ProductVariation",
+//   productVariationSchema
+// );
+
+const setVariationSchema = new Schema({
+  name: String,
+  numbered: Boolean,
+  autograph: Boolean,
+  colors: String,
+  base: Boolean,
+});
+
+setVariationSchema.index({ boxname: 1, year: 1 }, { unique: true });
+
+const SetVariation = mongoose.model("SetVariation", setVariationSchema);
+
+// CardVariation Schema ***********************************
+const cardSetSchema = new Schema({
+  boxname: String,
+  year: Number,
+  variant: [setVariationSchema],
+});
+
+const CardSet = mongoose.model("CardSet", cardSetSchema);
+
+//Brand Schema ****************************************
 const brandSchema = new Schema({
   name: { type: String, enum: brand, required: true },
-  variation: [productVariationSchema],
+  variation: [cardSetSchema],
 });
 
 const Brand = mongoose.model("Brand", brandSchema);
 
-const color = [
-  "blue",
-  "green",
-  "purple",
-  "tri-color",
-  "cracked ice",
-  "blue shimmer",
-];
-// Variation Schema
-const cardVariationSchema = new Schema({
-  numbered: Boolean,
-  autograph: Boolean,
-  color: { type: String, enum: color, required: true }, // potentially use ENUMS (preferred)
-});
-
-const CardVariation = mongoose.model("CardVariation", cardVariationSchema);
-
-// Card Schema
+// Card Schema ********************************************
 const cardSchema = new Schema({
   brand: { type: String, enum: brand, required: true },
-  product: [productVariationSchema],
+  setvariant: [setVariationSchema],
   cardNumber: Number,
 });
 
 const Card = mongoose.model("Card", cardSchema);
 
-export { Card, Player, Brand, CardVariation, ProductVariation, Sport }; // Added Product to the export
+export { Card, Athlete, Brand, CardSet, SetVariation, Sport };

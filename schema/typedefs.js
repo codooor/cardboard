@@ -3,18 +3,32 @@ import gql from "graphql-tag";
 const typeDefs = gql`
   enum SportName {
     NFL
-    College_Football
+    CFB
     NBA
-    College_Basketball
-    Major
-    League
-    Baseball
+    MCB
+    MLB
     WNBA
   }
 
   type Sport {
     id: ID!
     name: SportName!
+  }
+
+  type CardSet {
+    id: ID!
+    boxname: String!
+    year: Int!
+    variant: [SetVariation]
+  }
+
+  type SetVariation {
+    id: ID!
+    name: String!
+    numbered: Boolean!
+    autograph: Boolean!
+    colors: String!
+    base: Boolean!
   }
 
   enum BrandName {
@@ -27,38 +41,17 @@ const typeDefs = gql`
   type Brand {
     id: ID!
     name: BrandName!
-    variation: [ProductVariation]
-  }
-
-  enum Color {
-    blue
-    green
-    purple
-    tri_color
-    cracked_ice
-    blue_shimmer
-  }
-
-  type ProductVariation {
-    boxname: String!
-    yearMade: Int!
-  }
-
-  type CardVariation {
-    id: ID!
-    numbered: Boolean!
-    autograph: Boolean!
-    color: String!
+    variation: [SetVariation]
   }
 
   type Card {
     id: ID!
     brand: BrandName!
-    product: ProductVariation!
+    product: SetVariation!
     cardNumber: Int!
   }
 
-  type Player {
+  type Athlete {
     id: ID!
     firstname: String!
     lastname: String!
@@ -75,34 +68,38 @@ const typeDefs = gql`
     getAllBrands: [Brand]
     getBrandById(id: ID!): Brand
 
+    getAllSetVariation: [SetVariation]
+
     getAllCards: [Card]
     getAllCardsById(id: ID!): Card
 
-    getAllPlayers: [Player]
-    getAllPlayersById(id: ID!): Player
+    getAllAthlete: [Athlete]
+    getAllAthleteById(id: ID!): Athlete
   }
 
   type Mutation {
-    addNewSport(name: String!): Sport
+    addNewSport(name: SportName!): Sport
 
     addNewBrand(name: BrandName!): Brand
 
-    addNewProductVariation(
+    addNewSetVariation(
       boxname: String!
-      yearMade: Int!
+      year: Int!
+      numbered: Boolean!
+      autograph: Boolean!
       brandId: ID!
-    ): ProductVariation
+    ): SetVariation
 
-    addNewCard(brandId: ID!, productId: ID!, cardNumber: Int!): Card
+    addNewCardSet(boxname: String!, year: Int!): CardSet
 
-    addNewPlayer(
+    addNewAthlete(
       firstname: String!
       lastname: String!
       number: Int!
       team: String!
       position: String!
       sport: ID!
-    ): Player
+    ): Athlete
   }
 `;
 
