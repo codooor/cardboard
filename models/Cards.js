@@ -55,7 +55,7 @@ const ProductVariation = mongoose.model(
 // Brand Schema
 const brandSchema = new Schema({
   name: { type: String, enum: brand, required: true },
-  variation: [{ type: Schema.Types.ObjectId, ref: "Product Variation" }],
+  variation: [productVariationSchema],
 });
 
 const Brand = mongoose.model("Brand", brandSchema);

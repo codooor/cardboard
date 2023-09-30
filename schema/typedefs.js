@@ -27,6 +27,7 @@ const typeDefs = gql`
   type Brand {
     id: ID!
     name: BrandName!
+    variation: [ProductVariation]
   }
 
   enum Color {
@@ -85,6 +86,12 @@ const typeDefs = gql`
     addNewSport(name: String!): Sport
 
     addNewBrand(name: BrandName!): Brand
+
+    addNewProductVariation(
+      boxname: String!
+      yearMade: Int!
+      brandId: ID!
+    ): ProductVariation
 
     addNewCard(brandId: ID!, productId: ID!, cardNumber: Int!): Card
 

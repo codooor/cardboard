@@ -1,4 +1,10 @@
-import { Brand, Card, Player, Sport } from "../models/Cards.js";
+import {
+  Brand,
+  Card,
+  Player,
+  Sport,
+  ProductVariation,
+} from "../models/Cards.js";
 
 // CardVariation,
 // ProductVariation,
@@ -30,13 +36,21 @@ const resolvers = {
       }
     },
     getBrandById: async (_, { id }) => {
+      // console.log(`ID #${id} is being passed through!`);
       try {
-        return await Brand.findById(id)
-          .populate("product")
-          .populate("productSport");
+        const brand = await Brand.findById(id).populate("variation");
+
+        if (brand.variation.some((variation) => variation === null)) {
+          throw new Error(`Failed to fully populate id:${id} with variations`);
+        }
+
+        const brandObj = brand.toObject();
+        console.log("Full payload:", JSON.stringify(brandObj, null, 2));
+
+        return brand;
       } catch (error) {
-        console.error(`Error fetching brand with ID ${id}:`, error);
-        throw new Error(`Failed to fetch brand with ID ${id}.`);
+        console.error(`Error fetching brand name: ${id}:`, error);
+        throw new Error(`Failed to fetch brand name: ${id}.`);
       }
     },
     // getAllVariations: async () => {
@@ -146,6 +160,36 @@ const resolvers = {
       } catch (err) {
         console.error(err);
         throw new Error("failed to create new brand");
+      }
+    },
+    addNewProductVariation: async (_, { boxname, yearMade, brandId }, __) => {
+      const newVariation = new ProductVariation({
+        boxname,
+        yearMade,
+      });
+
+      if (!newVariation) {
+        throw new Error(`Failed to create new variation due to empty fields`);
+      }
+
+      try {
+        await newVariation.save();
+
+        const variationData = {
+          boxname: newVariation.boxname,
+          yearMade: newVariation.yearMade,
+        };
+
+        await Brand.findByIdAndUpdate(
+          brandId,
+          { $push: { variation: variationData } },
+          { new: true, useFindAndModify: false }
+        );
+
+        return newVariation;
+      } catch (err) {
+        console.error(err);
+        throw new Error("Failed to create a new product variation!");
       }
     },
     // addNewProduct: async (_, { productName, yearMade, varitaionId }, __) => {
