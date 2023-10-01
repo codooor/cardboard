@@ -15,20 +15,21 @@ const typeDefs = gql`
     name: SportName!
   }
 
+  type SetVariation {
+    id: ID!
+    setname: String!
+    numbered: Boolean!
+    autograph: Boolean!
+    color: Boolean!
+    base: Boolean!
+    cardSet: CardSet
+  }
+
   type CardSet {
     id: ID!
     boxname: String!
     year: Int!
     variant: [SetVariation]
-  }
-
-  type SetVariation {
-    id: ID!
-    name: String!
-    numbered: Boolean!
-    autograph: Boolean!
-    colors: String!
-    base: Boolean!
   }
 
   enum BrandName {
@@ -70,6 +71,9 @@ const typeDefs = gql`
 
     getAllSetVariation: [SetVariation]
 
+    getCardSetById(id: ID!): CardSet
+    getAllCardSet: [CardSet]
+
     getAllCards: [Card]
     getAllCardsById(id: ID!): Card
 
@@ -83,11 +87,12 @@ const typeDefs = gql`
     addNewBrand(name: BrandName!): Brand
 
     addNewSetVariation(
-      boxname: String!
-      year: Int!
+      setname: String!
       numbered: Boolean!
       autograph: Boolean!
-      brandId: ID!
+      base: Boolean!
+      color: Boolean!
+      cardset: ID!
     ): SetVariation
 
     addNewCardSet(boxname: String!, year: Int!): CardSet

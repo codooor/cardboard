@@ -56,14 +56,13 @@ const Athlete = mongoose.model("Athlete", athleteSchema);
 // );
 
 const setVariationSchema = new Schema({
-  name: String,
+  setname: String,
   numbered: Boolean,
   autograph: Boolean,
-  colors: String,
+  color: Boolean,
   base: Boolean,
+  cardset: { type: Schema.Types.ObjectId, ref: "CardSet" },
 });
-
-setVariationSchema.index({ boxname: 1, year: 1 }, { unique: true });
 
 const SetVariation = mongoose.model("SetVariation", setVariationSchema);
 
@@ -71,9 +70,10 @@ const SetVariation = mongoose.model("SetVariation", setVariationSchema);
 const cardSetSchema = new Schema({
   boxname: String,
   year: Number,
-  variant: [setVariationSchema],
+  variant: [{ type: Schema.Types.ObjectId, ref: "SetVariation" }],
 });
 
+// cardSetSchema.index({ boxname: 1, year: 1 }, { unique: true });
 const CardSet = mongoose.model("CardSet", cardSetSchema);
 
 //Brand Schema ****************************************
@@ -87,7 +87,6 @@ const Brand = mongoose.model("Brand", brandSchema);
 // Card Schema ********************************************
 const cardSchema = new Schema({
   brand: { type: String, enum: brand, required: true },
-  setvariant: [setVariationSchema],
   cardNumber: Number,
 });
 

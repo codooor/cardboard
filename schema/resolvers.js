@@ -89,19 +89,19 @@ const resolvers = {
     //     throw new Error(`Failed to fetch product with ID ${id}.`);
     //   }
     // },
-    getAllCards: async () => {
+    getAllCardSet: async () => {
       try {
-        return await Card.find();
+        return await CardSet.find();
       } catch (error) {
         console.error("Error fetching all cards:", error);
         throw new Error("Failed to fetch cards.");
       }
     },
-    getAllCardsById: async (_, { id }) => {
+    getCardSetById: async (_, { id }) => {
       try {
-        return await Card.findById(id);
+        return await CardSet.findById(id).populate("variant");
       } catch (error) {
-        console.error(`Error fetching card with ID ${id}:`, error);
+        console.error(`Error fetching card with ID ${id}:`, error.essage);
         throw new Error(`Failed to fetch card with ID ${id}.`);
       }
     },
@@ -165,15 +165,16 @@ const resolvers = {
     },
     addNewSetVariation: async (
       _,
-      { boxname, year, numbered, autograph, brandId },
+      { setname, numbered, autograph, color, base, cardSetId },
       __
     ) => {
       const newSetVariation = new SetVariation({
-        boxname,
-        year,
+        setname,
         numbered,
         autograph,
-        brandId,
+        color,
+        base,
+        cardset: cardSetId,
       });
 
       if (!newSetVariation) {
@@ -183,28 +184,15 @@ const resolvers = {
       try {
         await newSetVariation.save();
 
-        const newSetVariationData = {
-          boxname: newSetVariation.boxname,
-          year: newSetVariation.year,
-          numbered: newSetVariation.numbered,
-          autograph: newSetVariation.autograph,
-        };
-
-        await Brand.findByIdAndUpdate(
-          brandId,
-          { $push: { variation: newSetVariationData } },
+        await CardSet.findByIdAndUpdate(
+          cardSetId,
+          { $push: { variant: newSetVariation } },
           { new: true, useFindAndModify: false }
         );
 
         return newSetVariation;
       } catch (err) {
-        if (err.code === 11000) {
-          // MongoDB duplicate key error code
-          throw new Error(
-            "A product variation with this boxname and year already exists"
-          );
-        }
-        console.error(err);
+        console.error(err.message);
         throw new Error("Failed to create a new product variation!");
       }
     },
