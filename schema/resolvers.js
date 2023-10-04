@@ -5,7 +5,8 @@ import { Brand, Athlete, Sport, CardSet, Card } from "../models/Cards.js";
 
 const resolvers = {
   Query: {
-    // read
+    // GET:
+
     getAllSports: async () => {
       try {
         return await Sport.find();
@@ -106,7 +107,7 @@ const resolvers = {
   },
 
   Mutation: {
-    // create:
+    // POST:
 
     addNewSport: async (_, { name }, __) => {
       const newSport = new Sport({
@@ -236,7 +237,7 @@ const resolvers = {
       }
     },
 
-    // delete:
+    // DELETE:
 
     deleteSportByName: async (_, { name }, __) => {
       try {
@@ -259,12 +260,42 @@ const resolvers = {
           return null;
         }
 
-        await Brand.updateMany({ variant: id }, { $pull: { cardset: id } });
+        await Brand.updateMany({ cardset: id }, { $pull: { cardset: id } });
 
         console.log(`Deleting CardSet: ${deletedCardSet}`);
         return deletedCardSet;
       } catch (err) {
         console.error(err.message);
+      }
+    },
+    deleteAthleteById: async (_, { id }) => {
+      try {
+        const existingAthlete = await Athlete.findById(id);
+
+        if (!existingAthlete) {
+          console.log(`No Athlete with ID: ${id}`);
+          return null;
+        }
+
+        await Card.deleteMany({ athlete: id });
+
+        const deletedAthlete = await Athlete.findByIdAndDelete(id);
+
+        console.log(`Deleting Athlete: ${deletedAthlete}`);
+        return deletedAthlete;
+      } catch (err) {
+        console.error(err.message);
+        throw new Error(`Unable to delete Athlete with ID: ${id}`);
+      }
+    },
+    deleteCardById: async (_, { id }) => {
+      try {
+        const deletedCard = await Card.findByIdAndDelete(id);
+
+        return deletedCard;
+      } catch (err) {
+        console.error(err.message);
+        throw new Error(`Cannot delete this card with ID: ${id}`);
       }
     },
   },

@@ -68,6 +68,7 @@ const typeDefs = gql`
       isNumberedTo: Boolean!
       athleteId: ID!
     ): Card
+    deleteCardById(id: ID!): Card
 
     addNewAthlete(
       firstname: String!
@@ -80,6 +81,8 @@ const typeDefs = gql`
 
     deleteSportByName(name: String!): Sport
     deleteCardSetById(id: ID!): CardSet
+
+    deleteAthleteById(id: ID!): Athlete
   }
 `;
 
