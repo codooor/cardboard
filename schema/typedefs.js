@@ -14,13 +14,7 @@ const typeDefs = gql`
     team: String!
     position: String!
     sport: Sport
-  }
-
-  enum BrandName {
-    Panini
-    Topps
-    Leaf
-    Bowman
+    cards: [Card]
   }
 
   type Brand {
@@ -38,8 +32,10 @@ const typeDefs = gql`
 
   type Card {
     id: ID!
-    brand: Brand
-    cardNumber: Int!
+    number: Int!
+    isAutographed: Boolean!
+    isNumberedTo: Boolean!
+    athlete: Athlete
   }
 
   type Query {
@@ -53,10 +49,10 @@ const typeDefs = gql`
     getCardSetById(id: ID!): CardSet
 
     getAllCards: [Card]
-    getAllCardsById(id: ID!): Card
+    getCardById(id: ID!): Card
 
     getAllAthlete: [Athlete]
-    getAllAthleteById(id: ID!): Athlete
+    getAthleteById(id: ID!): Athlete
   }
 
   type Mutation {
@@ -65,6 +61,13 @@ const typeDefs = gql`
     addNewBrand(name: String!): Brand
 
     addNewCardSet(boxname: String!, year: Int!, brandId: ID!): CardSet
+
+    addNewCard(
+      number: Int!
+      isAutographed: Boolean!
+      isNumberedTo: Boolean!
+      athleteId: ID!
+    ): Card
 
     addNewAthlete(
       firstname: String!

@@ -26,20 +26,20 @@ const athleteSchema = new Schema({
   team: String,
   position: String,
   sport: { type: Schema.Types.ObjectId, ref: "Sport" },
+  cards: [{ type: Schema.Types.ObjectId, ref: "Card" }],
 });
 
 const Athlete = mongoose.model("Athlete", athleteSchema);
 
-// CardVariation Schema ***********************************
-const cardSetSchema = new Schema({
-  boxname: String,
-  year: Number,
-  brand: { type: Schema.Types.ObjectId, ref: "Brand" },
-  variant: [{ type: Schema.Types.ObjectId, ref: "SetVariation" }],
+// Card Schema ********************************************
+const cardSchema = new Schema({
+  number: Number,
+  isAutographed: Boolean,
+  isNumberedTo: Boolean,
+  athlete: { type: Schema.Types.ObjectId, ref: "Athlete" },
 });
 
-// cardSetSchema.index({ boxname: 1, year: 1 }, { unique: true });
-const CardSet = mongoose.model("CardSet", cardSetSchema);
+const Card = mongoose.model("Card", cardSchema);
 
 //Brand Schema ****************************************
 const brandSchema = new Schema({
@@ -49,12 +49,15 @@ const brandSchema = new Schema({
 
 const Brand = mongoose.model("Brand", brandSchema);
 
-// Card Schema ********************************************
-const cardSchema = new Schema({
+// CardVariation Schema ***********************************
+const cardSetSchema = new Schema({
+  boxname: String,
+  year: Number,
   brand: { type: Schema.Types.ObjectId, ref: "Brand" },
-  cardNumber: Number,
+  cards: [{ type: Schema.Types.ObjectId, ref: "Card" }],
 });
 
-const Card = mongoose.model("Card", cardSchema);
+// cardSetSchema.index({ boxname: 1, year: 1 }, { unique: true });
+const CardSet = mongoose.model("CardSet", cardSetSchema);
 
 export { Card, Athlete, Brand, CardSet, Sport };

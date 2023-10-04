@@ -1,4 +1,4 @@
-import { Brand, Athlete, Sport, CardSet } from "../models/Cards.js";
+import { Brand, Athlete, Sport, CardSet, Card } from "../models/Cards.js";
 
 // CardSet
 // SetVariation
@@ -72,12 +72,35 @@ const resolvers = {
         throw new Error("Failed to fetch athletes.");
       }
     },
-    getAllAthleteById: async (_, { id }) => {
+    getAthleteById: async (_, { id }) => {
       try {
-        return await Athlete.findById(id).populate("sport");
+        return await Athlete.findById(id).populate("sport").populate("cards");
       } catch (err) {
         console.error(err.message);
         throw new Error(`Failed to fetch player with ID ${id}.`);
+      }
+    },
+    getAllCards: async () => {
+      try {
+        const allCardsInDB = await Card.find().populate("athlete");
+
+        return allCardsInDB;
+      } catch (err) {
+        console.error(err.message);
+      }
+    },
+    getCardById: async (_, { id }) => {
+      try {
+        const card = await Card.findById(id).populate("athlete");
+
+        if (!card) {
+          throw new Error(`No card ID: ${id} found in this DB`);
+        }
+
+        return card;
+      } catch (err) {
+        console.error(err.message);
+        throw new Error(`Error fetching this card`);
       }
     },
   },
@@ -94,13 +117,8 @@ const resolvers = {
         await newSport.save();
         return newSport; // Return the newly created sport
       } catch (err) {
-        if (err.code === 11000 && err.keyPattern && err.keyPattern.name === 1) {
-          console.error("This sport already exists");
-          return null;
-        } else {
-          console.error("Error saving sport:", err.message);
-          throw new Error("Failed to save the sport");
-        }
+        console.error(err.message);
+        throw new Error(`Error saving new sport`);
       }
     },
 
@@ -183,6 +201,38 @@ const resolvers = {
       } catch (err) {
         console.error(err);
         throw new Error("Card set save unsuccessful.");
+      }
+    },
+    addNewCard: async (
+      _,
+      { number, isAutographed, isNumberedTo, athleteId }
+    ) => {
+      try {
+        const existingAthlete = await Athlete.findById(athleteId);
+        if (!existingAthlete) {
+          throw new Error(`No existing athlete with this ID: ${athleteId}`);
+        }
+
+        const newCard = new Card({
+          number,
+          isAutographed,
+          isNumberedTo,
+          athlete: athleteId,
+        });
+
+        await newCard.save();
+
+        existingAthlete.cards.push(newCard._id);
+        await existingAthlete.save();
+
+        const populatedCard = await Card.findById(newCard._id).populate(
+          "athlete"
+        );
+
+        return populatedCard;
+      } catch (err) {
+        console.error(err.message);
+        throw new Error(`Unable to create new card`);
       }
     },
 
