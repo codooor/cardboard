@@ -1,35 +1,19 @@
 import gql from "graphql-tag";
 
 const typeDefs = gql`
-  enum SportName {
-    NFL
-    CFB
-    NBA
-    MCB
-    MLB
-    WNBA
-  }
-
   type Sport {
     id: ID!
-    name: SportName!
+    name: String!
   }
 
-  type SetVariation {
+  type Athlete {
     id: ID!
-    setname: String!
-    numbered: Boolean!
-    autograph: Boolean!
-    color: Boolean!
-    base: Boolean!
-    cardSet: CardSet
-  }
-
-  type CardSet {
-    id: ID!
-    boxname: String!
-    year: Int!
-    variant: [SetVariation]
+    firstname: String!
+    lastname: String!
+    number: Int!
+    team: String!
+    position: String!
+    sport: Sport
   }
 
   enum BrandName {
@@ -42,24 +26,20 @@ const typeDefs = gql`
   type Brand {
     id: ID!
     name: BrandName!
-    variation: [SetVariation]
+    cardset: [CardSet]
+  }
+
+  type CardSet {
+    id: ID!
+    boxname: String!
+    year: Int!
+    brand: Brand
   }
 
   type Card {
     id: ID!
     brand: BrandName!
-    product: SetVariation!
     cardNumber: Int!
-  }
-
-  type Athlete {
-    id: ID!
-    firstname: String!
-    lastname: String!
-    number: Int!
-    team: String!
-    position: String!
-    sport: Sport!
   }
 
   type Query {
@@ -69,10 +49,8 @@ const typeDefs = gql`
     getAllBrands: [Brand]
     getBrandById(id: ID!): Brand
 
-    getAllSetVariation: [SetVariation]
-
-    getCardSetById(id: ID!): CardSet
     getAllCardSet: [CardSet]
+    getCardSetById(id: ID!): CardSet
 
     getAllCards: [Card]
     getAllCardsById(id: ID!): Card
@@ -82,20 +60,11 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    addNewSport(name: SportName!): Sport
+    addNewSport(name: String!): Sport
 
     addNewBrand(name: BrandName!): Brand
 
-    addNewSetVariation(
-      setname: String!
-      numbered: Boolean!
-      autograph: Boolean!
-      base: Boolean!
-      color: Boolean!
-      cardset: ID!
-    ): SetVariation
-
-    addNewCardSet(boxname: String!, year: Int!): CardSet
+    addNewCardSet(boxname: String!, year: Int!, brandId: ID!): CardSet
 
     addNewAthlete(
       firstname: String!
@@ -103,8 +72,11 @@ const typeDefs = gql`
       number: Int!
       team: String!
       position: String!
-      sport: ID!
+      sportId: ID!
     ): Athlete
+
+    deleteSportByName(name: String!): Sport
+    deleteCardSetById(id: ID!): CardSet
   }
 `;
 

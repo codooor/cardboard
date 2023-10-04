@@ -9,7 +9,7 @@ weak entity does not have an indetifying attribute
 
 // database ENUMS
 const brand = ["Panini", "Topps", "Leaf", "Bowman"];
-const sports = ["NFL", "CFB", "NBA", "MCB", "MLB", "WNBA"];
+// const sports = ["NFL", "CFB", "NBA", "MCB", "MLB", "WNBA"];
 // const color = [
 //   "blue",
 //   "green",
@@ -23,7 +23,8 @@ const sports = ["NFL", "CFB", "NBA", "MCB", "MLB", "WNBA"];
 const sportSchema = new Schema({
   name: {
     type: String,
-    enum: sports,
+    required: true,
+    unique: true,
   },
 });
 
@@ -36,40 +37,16 @@ const athleteSchema = new Schema({
   number: Number,
   team: String,
   position: String,
-  sport: { type: String, enum: sports, required: true },
+  sport: { type: Schema.Types.ObjectId, ref: "Sport" },
 });
 
 const Athlete = mongoose.model("Athlete", athleteSchema);
-
-// ProductVariation *****************************
-// const productVariationSchema = new Schema({
-//   boxname: String,
-//   yearMade: Number,
-//   cardvariant: [cardSetSchema],
-// });
-
-// ProductVariation index
-
-// const ProductVariation = mongoose.model(
-//   "ProductVariation",
-//   productVariationSchema
-// );
-
-const setVariationSchema = new Schema({
-  setname: String,
-  numbered: Boolean,
-  autograph: Boolean,
-  color: Boolean,
-  base: Boolean,
-  cardset: { type: Schema.Types.ObjectId, ref: "CardSet" },
-});
-
-const SetVariation = mongoose.model("SetVariation", setVariationSchema);
 
 // CardVariation Schema ***********************************
 const cardSetSchema = new Schema({
   boxname: String,
   year: Number,
+  brand: { type: Schema.Types.ObjectId, ref: "Brand" },
   variant: [{ type: Schema.Types.ObjectId, ref: "SetVariation" }],
 });
 
@@ -79,7 +56,7 @@ const CardSet = mongoose.model("CardSet", cardSetSchema);
 //Brand Schema ****************************************
 const brandSchema = new Schema({
   name: { type: String, enum: brand, required: true },
-  variation: [cardSetSchema],
+  cardset: [{ type: Schema.Types.ObjectId, ref: "CardSet" }],
 });
 
 const Brand = mongoose.model("Brand", brandSchema);
@@ -92,4 +69,4 @@ const cardSchema = new Schema({
 
 const Card = mongoose.model("Card", cardSchema);
 
-export { Card, Athlete, Brand, CardSet, SetVariation, Sport };
+export { Card, Athlete, Brand, CardSet, Sport };

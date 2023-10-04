@@ -1,39 +1,35 @@
-import {
-  Brand,
-  Card,
-  Athlete,
-  Sport,
-  CardSet,
-  SetVariation,
-} from "../models/Cards.js";
+import { Brand, Athlete, Sport, CardSet } from "../models/Cards.js";
 
 // CardSet
 // SetVariation
 
 const resolvers = {
   Query: {
+    // read
     getAllSports: async () => {
       try {
         return await Sport.find();
-      } catch (error) {
-        console.error("Error fetching all sports:", error);
+      } catch (err) {
+        console.error(err.message);
         throw new Error("Failed to fetch sports.");
       }
     },
     getSportById: async (_, { id }) => {
       try {
         return await Sport.findById(id);
-      } catch (error) {
-        console.error(`Error fetching sport with ID ${id}:`, error);
+      } catch (err) {
+        console.error(err.message);
         throw new Error(`Failed to fetch sport with ID ${id}.`);
       }
     },
     getAllBrands: async () => {
       try {
-        return await Brand.find();
-      } catch (error) {
-        console.error("Error fetching all brands:", error);
-        throw error;
+        const allBrands = await Brand.find().populate("cardset");
+
+        return allBrands;
+      } catch (err) {
+        console.error(err.message);
+        throw new Error("Cannot find any brands");
       }
     },
     getBrandById: async (_, { id }) => {
@@ -49,99 +45,101 @@ const resolvers = {
         // console.log("Full payload:", JSON.stringify(brandObj, null, 2));
 
         return brand;
-      } catch (error) {
-        console.error(`Error fetching brand name: ${id}:`, error);
+      } catch (err) {
+        console.error(err.message);
         throw new Error(`Failed to fetch brand name: ${id}.`);
       }
     },
-    getAllSetVariation: async () => {
-      try {
-        return await SetVariation.find();
-      } catch (error) {
-        console.error("Error fetching all variations:", error);
-        throw new Error("Failed to fetch variations.");
-      }
-    },
-    // getAllVariationsById: async (_, { id }) => {
-    //   try {
-    //     return await Variation.findById(id);
-    //   } catch (error) {
-    //     console.error(`Error fetching variation with ID ${id}:`, error);
-    //     throw new Error(`Failed to fetch variation with ID ${id}.`);
-    //   }
-    // },
-    // getAllProducts: async () => {
-    //   if (!Product) {
-    //     throw new Error("There are no products");
-    //   }
-    //   try {
-    //     return await Product.find();
-    //   } catch (error) {
-    //     console.error("Error fetching all products:", error);
-    //     throw new Error("Failed to fetch products.");
-    //   }
-    // },
-    // getProductById: async (_, { id }) => {
-    //   try {
-    //     return await Product.findById(id).populate("productVariations");
-    //   } catch (error) {
-    //     console.error(`Error fetching product with ID ${id}:`, error);
-    //     throw new Error(`Failed to fetch product with ID ${id}.`);
-    //   }
-    // },
+
     getAllCardSet: async () => {
       try {
-        return await CardSet.find();
-      } catch (error) {
-        console.error("Error fetching all cards:", error);
+        return await CardSet.find().populate("brand");
+      } catch (err) {
+        console.error(err.message);
         throw new Error("Failed to fetch cards.");
       }
     },
     getCardSetById: async (_, { id }) => {
       try {
-        return await CardSet.findById(id).populate("variant");
-      } catch (error) {
-        console.error(`Error fetching card with ID ${id}:`, error.essage);
+        return await CardSet.findById(id);
+      } catch (err) {
+        console.error(err.message);
         throw new Error(`Failed to fetch card with ID ${id}.`);
       }
     },
     getAllAthlete: async () => {
       try {
         return await Athlete.find();
-      } catch (error) {
-        console.error("Error fetching all players:", error);
+      } catch (err) {
+        console.error(err.message);
         throw new Error("Failed to fetch athletes.");
       }
     },
     getAllAthleteById: async (_, { id }) => {
       try {
-        return await Athlete.findById(id);
-      } catch (error) {
-        console.error(`Error fetching player with ID ${id}:`, error);
+        return await Athlete.findById(id).populate("sport");
+      } catch (err) {
+        console.error(err.message);
         throw new Error(`Failed to fetch player with ID ${id}.`);
       }
     },
   },
 
   Mutation: {
+    // create:
+
     addNewSport: async (_, { name }, __) => {
-      // Ensure you destructure { name } here
       const newSport = new Sport({
         name: name,
       });
 
-      if (!newSport) {
-        throw new Error("No Sport Created");
-      } else {
-        console.log("saved:", newSport);
-      }
-
       try {
         await newSport.save();
-        return newSport; // Return the new Sport instance after it has been saved
-      } catch (error) {
-        console.error(error); // Log any errors
-        throw new Error("Failed to save new sport"); // Throw an error to the client
+        return newSport; // Return the newly created sport
+      } catch (err) {
+        if (err.code === 11000 && err.keyPattern && err.keyPattern.name === 1) {
+          console.error("This sport already exists");
+          return null;
+        } else {
+          console.error("Error saving sport:", err.message);
+          throw new Error("Failed to save the sport");
+        }
+      }
+    },
+
+    addNewAthlete: async (
+      _,
+      { firstname, lastname, number, team, position, sportId }
+    ) => {
+      try {
+        // Check if the specified sportId exists in the Sport collection
+        const existingSport = await Sport.findById(sportId);
+        if (!existingSport) {
+          throw new Error(`Sport with ID ${sportId} does not exist.`);
+        }
+
+        // Create a new athlete with the provided information and the specified sportId
+        const newAthlete = new Athlete({
+          firstname,
+          lastname,
+          number,
+          team,
+          position,
+          sport: sportId, // Assign the sportId to the athlete's sport field
+        });
+
+        // Save the new athlete to the database
+        await newAthlete.save();
+
+        // Return the newly created athlete
+        const populatedAthlete = await Athlete.findById(
+          newAthlete._id
+        ).populate("sport");
+
+        return populatedAthlete;
+      } catch (err) {
+        console.error("Athlete: ", err.message);
+        throw new Error("Failed to add a new athlete.");
       }
     },
     addNewBrand: async (_, { name }, __) => {
@@ -163,58 +161,62 @@ const resolvers = {
         throw new Error("failed to create new brand");
       }
     },
-    addNewSetVariation: async (
-      _,
-      { setname, numbered, autograph, color, base, cardSetId },
-      __
-    ) => {
-      const newSetVariation = new SetVariation({
-        setname,
-        numbered,
-        autograph,
-        color,
-        base,
-        cardset: cardSetId,
-      });
-
-      if (!newSetVariation) {
-        throw new Error(`Failed to create new variation due to empty fields`);
+    addNewCardSet: async (_, { boxname, year, brandId }) => {
+      const existingBrand = await Brand.findById(brandId);
+      if (!existingBrand) {
+        throw new Error(`No existing brand with this ID: ${brandId}`);
       }
-
-      try {
-        await newSetVariation.save();
-
-        await CardSet.findByIdAndUpdate(
-          cardSetId,
-          { $push: { variant: newSetVariation } },
-          { new: true, useFindAndModify: false }
-        );
-
-        return newSetVariation;
-      } catch (err) {
-        console.error(err.message);
-        throw new Error("Failed to create a new product variation!");
-      }
-    },
-    addNewCardSet: async (_, { boxname, year }) => {
       const newCardSet = new CardSet({
         boxname,
         year,
+        brand: brandId,
       });
-
-      if (!newCardSet) {
-        throw new Error(`Card set not complete. Fill in all fields`);
-      } else {
-        console.log(`New card set: ${newCardSet} created.`);
-      }
 
       try {
         await newCardSet.save();
 
-        return newCardSet;
+        existingBrand.cardset.push(newCardSet._id);
+        await existingBrand.save();
+
+        const populatedCardSet = await CardSet.findById(
+          newCardSet._id
+        ).populate("brand");
+
+        return populatedCardSet;
       } catch (err) {
         console.error(err);
         throw new Error("Card set save unsuccessful.");
+      }
+    },
+
+    // delete:
+
+    deleteSportByName: async (_, { name }, __) => {
+      try {
+        const deletedSports = await Sport.deleteMany({
+          name: new RegExp(name, "i"),
+        });
+
+        return console.log(`Successful Deletion:`, deletedSports);
+      } catch (err) {
+        console.error(err.message);
+        throw new Error("Failed to delete sports");
+      }
+    },
+    deleteCardSetById: async (_, { id }) => {
+      try {
+        const deletedCardSet = await CardSet.findByIdAndDelete(id);
+
+        if (!deletedCardSet) {
+          console.log(`No CardSet with ID: ${id}`);
+        } else {
+          console.log(`Printing CardSet ID: ${id} ready for deletion`);
+        }
+
+        console.log(`Deleting CardSet: ${deletedCardSet}`);
+        return deletedCardSet;
+      } catch (err) {
+        console.error(err.message);
       }
     },
   },
