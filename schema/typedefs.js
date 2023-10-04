@@ -25,7 +25,7 @@ const typeDefs = gql`
 
   type Brand {
     id: ID!
-    name: BrandName!
+    name: String!
     cardset: [CardSet]
   }
 
@@ -38,7 +38,7 @@ const typeDefs = gql`
 
   type Card {
     id: ID!
-    brand: BrandName!
+    brand: Brand
     cardNumber: Int!
   }
 
@@ -62,7 +62,7 @@ const typeDefs = gql`
   type Mutation {
     addNewSport(name: String!): Sport
 
-    addNewBrand(name: BrandName!): Brand
+    addNewBrand(name: String!): Brand
 
     addNewCardSet(boxname: String!, year: Int!, brandId: ID!): CardSet
 

@@ -7,18 +7,6 @@ weak entity does not have an indetifying attribute
   -Tasks have taskcodes tasknames durationtimes = no unique attribute
 ******* */
 
-// database ENUMS
-const brand = ["Panini", "Topps", "Leaf", "Bowman"];
-// const sports = ["NFL", "CFB", "NBA", "MCB", "MLB", "WNBA"];
-// const color = [
-//   "blue",
-//   "green",
-//   "purple",
-//   "tri-color",
-//   "cracked ice",
-//   "blue shimmer",
-// ];
-
 // Sport Schema ********************************
 const sportSchema = new Schema({
   name: {
@@ -55,7 +43,7 @@ const CardSet = mongoose.model("CardSet", cardSetSchema);
 
 //Brand Schema ****************************************
 const brandSchema = new Schema({
-  name: { type: String, enum: brand, required: true },
+  name: String,
   cardset: [{ type: Schema.Types.ObjectId, ref: "CardSet" }],
 });
 
@@ -63,7 +51,7 @@ const Brand = mongoose.model("Brand", brandSchema);
 
 // Card Schema ********************************************
 const cardSchema = new Schema({
-  brand: { type: String, enum: brand, required: true },
+  brand: { type: Schema.Types.ObjectId, ref: "Brand" },
   cardNumber: Number,
 });
 

@@ -35,11 +35,8 @@ const resolvers = {
     getBrandById: async (_, { id }) => {
       // console.log(`ID #${id} is being passed through!`);
       try {
-        const brand = await Brand.findById(id).populate("variation");
-
-        if (brand.variation.some((variation) => variation === null)) {
-          throw new Error(`Failed to fully populate id:${id} with variations`);
-        }
+        const brand = await Brand.findById(id).populate("cardset");
+        console.log(brand);
 
         // const brandObj = brand.toObject();
         // console.log("Full payload:", JSON.stringify(brandObj, null, 2));
@@ -209,9 +206,10 @@ const resolvers = {
 
         if (!deletedCardSet) {
           console.log(`No CardSet with ID: ${id}`);
-        } else {
-          console.log(`Printing CardSet ID: ${id} ready for deletion`);
+          return null;
         }
+
+        await Brand.updateMany({ variant: id }, { $pull: { cardset: id } });
 
         console.log(`Deleting CardSet: ${deletedCardSet}`);
         return deletedCardSet;
