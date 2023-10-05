@@ -18,6 +18,13 @@ const sportSchema = new Schema({
 
 const Sport = mongoose.model("Sport", sportSchema);
 
+const teamSchema = new Schema({
+  name: String,
+  sport: { type: Schema.Types.ObjectId, ref: "Sport" },
+});
+
+const Team = mongoose.model("Team", teamSchema);
+
 // Player Schema ******************************
 const athleteSchema = new Schema({
   firstname: String,
@@ -60,4 +67,4 @@ const cardSetSchema = new Schema({
 // cardSetSchema.index({ boxname: 1, year: 1 }, { unique: true });
 const CardSet = mongoose.model("CardSet", cardSetSchema);
 
-export { Card, Athlete, Brand, CardSet, Sport };
+export { Card, Athlete, Brand, CardSet, Sport, Team };

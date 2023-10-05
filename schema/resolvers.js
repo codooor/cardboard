@@ -1,4 +1,4 @@
-import { Brand, Athlete, Sport, CardSet, Card } from "../models/Cards.js";
+import { Brand, Athlete, Sport, CardSet, Card, Team } from "../models/Cards.js";
 
 // CardSet
 // SetVariation
@@ -21,6 +21,17 @@ const resolvers = {
       } catch (err) {
         console.error(err.message);
         throw new Error(`Failed to fetch sport with ID ${id}.`);
+      }
+    },
+
+    getAllTeams: async () => {
+      try {
+        const allTeams = await Team.find().populate("sport");
+
+        return allTeams;
+      } catch (err) {
+        console.error(err.message);
+        throw new Error(`No Teams available.`);
       }
     },
     getAllBrands: async () => {
@@ -120,6 +131,31 @@ const resolvers = {
       } catch (err) {
         console.error(err.message);
         throw new Error(`Error saving new sport`);
+      }
+    },
+
+    addNewTeam: async (_, { name, sportId }) => {
+      try {
+        const existingSport = await Sport.findById(sportId);
+        if (!existingSport) {
+          throw new Error(`Sport with ID ${sportId} does not exist.`);
+        }
+
+        const newTeam = new Team({
+          name,
+          sport: sportId,
+        });
+
+        await newTeam.save();
+
+        const populateSport = await Team.findById(newTeam._id).populate(
+          "sport"
+        );
+
+        console.log(`Succesful field 'sport' population:`, populateSport);
+        return populateSport;
+      } catch (err) {
+        console.error(err.message);
       }
     },
 
@@ -296,6 +332,26 @@ const resolvers = {
       } catch (err) {
         console.error(err.message);
         throw new Error(`Cannot delete this card with ID: ${id}`);
+      }
+    },
+    deleteBrandById: async (_, { id }) => {
+      try {
+        const existingBrand = await Brand.findById(id);
+
+        if (!existingBrand) {
+          console.log(`No Brand with ID: ${id}`);
+          return null;
+        }
+
+        await CardSet.deleteMany({ brand: id });
+
+        const deletedBrand = await Brand.findByIdAndDelete(id);
+
+        console.log(`Branded deleted with ID: ${id}`);
+        return deletedBrand;
+      } catch (err) {
+        console.error(err.message);
+        throw new Error(`Unable to delete Brand with ID: ${id}`);
       }
     },
   },

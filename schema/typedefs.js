@@ -6,12 +6,18 @@ const typeDefs = gql`
     name: String!
   }
 
+  type Team {
+    id: ID!
+    name: String!
+    sport: Sport
+  }
+
   type Athlete {
     id: ID!
     firstname: String!
     lastname: String!
     number: Int!
-    team: String!
+    team: [Team]
     position: String!
     sport: Sport
     cards: [Card]
@@ -42,6 +48,8 @@ const typeDefs = gql`
     getAllSports: [Sport]
     getSportById(id: ID!): Sport
 
+    getAllTeams: [Team]
+
     getAllBrands: [Brand]
     getBrandById(id: ID!): Brand
 
@@ -58,7 +66,10 @@ const typeDefs = gql`
   type Mutation {
     addNewSport(name: String!): Sport
 
+    addNewTeam(name: String!, sportId: ID!): Team
+
     addNewBrand(name: String!): Brand
+    deleteBrandById(id: ID!): Brand
 
     addNewCardSet(boxname: String!, year: Int!, brandId: ID!): CardSet
 
