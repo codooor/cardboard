@@ -34,6 +34,20 @@ const resolvers = {
         throw new Error(`No Teams available.`);
       }
     },
+    getTeamById: async (_, { id }) => {
+      try {
+        const team = await Team.findById(id).populate("sport");
+
+        if (!team) {
+          throw new Error(`No Team with ID: ${id}`);
+        }
+
+        return team;
+      } catch (err) {
+        console.error(err.message);
+        throw new Error(`Unable to fetch team with ID: ${id}`);
+      }
+    },
     getAllBrands: async () => {
       try {
         const allBrands = await Brand.find().populate("cardset");
@@ -285,6 +299,21 @@ const resolvers = {
       } catch (err) {
         console.error(err.message);
         throw new Error("Failed to delete sports");
+      }
+    },
+    deleteSportById: async (_, { id }) => {
+      try {
+        const deletedSport = await Sport.findByIdAndDelete(id);
+
+        if (!deletedSport) {
+          throw new Error(`No Sport with ID: ${id}`);
+        }
+
+        console.log(`Successfully Deleted: ${deletedSport}`);
+        return deletedSport;
+      } catch (error) {
+        console.error(error.message);
+        throw new Error(`Could not delete sport:`, deletedSport);
       }
     },
     deleteCardSetById: async (_, { id }) => {

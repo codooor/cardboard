@@ -34,7 +34,16 @@ const server = new ApolloServer({
 
 await server.start();
 
-app.use("/graphql", cors(), json(), expressMiddleware(server));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST"],
+  })
+);
+
+app.use(json());
+app.use("/graphql", expressMiddleware(server));
 
 // // sport routes
 // app.post("/sport", newSport);

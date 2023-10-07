@@ -49,6 +49,7 @@ const typeDefs = gql`
     getSportById(id: ID!): Sport
 
     getAllTeams: [Team]
+    getTeamById(id: ID!): Team
 
     getAllBrands: [Brand]
     getBrandById(id: ID!): Brand
@@ -91,6 +92,8 @@ const typeDefs = gql`
     ): Athlete
 
     deleteSportByName(name: String!): Sport
+    deleteSportById(id: ID!): Sport
+
     deleteCardSetById(id: ID!): CardSet
 
     deleteAthleteById(id: ID!): Athlete
