@@ -1,4 +1,12 @@
-import { Brand, Athlete, Sport, CardSet, Card, Team } from "../models/Cards.js";
+import {
+  Brand,
+  Athlete,
+  Sport,
+  CardSet,
+  Card,
+  Team,
+  Division,
+} from "../models/Cards.js";
 
 // CardSet
 // SetVariation
@@ -145,6 +153,19 @@ const resolvers = {
       } catch (err) {
         console.error(err.message);
         throw new Error(`Error saving new sport`);
+      }
+    },
+
+    addNewDivision: async (_, { division }) => {
+      try {
+        const newDivision = new Division({
+          division,
+        });
+
+        return newDivision.populate("teams");
+      } catch (err) {
+        console.error(err.message);
+        throw new Error("Unable to create new divison");
       }
     },
 

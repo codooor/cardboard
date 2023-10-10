@@ -21,9 +21,25 @@ const Sport = mongoose.model("Sport", sportSchema);
 const teamSchema = new Schema({
   name: String,
   sport: { type: Schema.Types.ObjectId, ref: "Sport" },
+  division: { type: Schema.Types.ObjectId, ref: "Division" },
 });
 
 const Team = mongoose.model("Team", teamSchema);
+
+const leagueDivisionSchema = new Schema({
+  division: String,
+  teams: [{ type: Schema.Types.ObjectId, ref: "Team" }],
+});
+
+const Division = mongoose.model("Division", leagueDivisionSchema);
+
+const conferenceSchema = new Schema({
+  name: String,
+  teams: [{ type: Schema.Types.ObjectId, ref: "Team" }],
+  divisions: [{ type: Schema.Types.ObjectId, ref: "Division" }],
+});
+
+const Conference = mongoose.model("Conference", conferenceSchema);
 
 // Player Schema ******************************
 const athleteSchema = new Schema({
@@ -67,4 +83,4 @@ const cardSetSchema = new Schema({
 // cardSetSchema.index({ boxname: 1, year: 1 }, { unique: true });
 const CardSet = mongoose.model("CardSet", cardSetSchema);
 
-export { Card, Athlete, Brand, CardSet, Sport, Team };
+export { Card, Athlete, Brand, CardSet, Sport, Team, Division, Conference };
