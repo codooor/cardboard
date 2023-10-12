@@ -144,17 +144,38 @@ const resolvers = {
   Mutation: {
     // POST:
 
-    addNewSport: async (_, { name }, __) => {
-      const newSport = new Sport({
-        name: name,
-      });
-
+    addNewSport: async (_, { name, conferenceId }) => {
       try {
-        await newSport.save();
-        return newSport;
+        const existingSport = await Sport.findOne({ name: name });
+
+        if (existingSport) {
+          const updates = {
+            conference: conferenceId,
+          };
+          console.log(
+            `Sport exists with name ${existingSport.name}. Update fields`
+          );
+
+          const newUpdates = await Sport.findByIdAndUpdate(
+            existingSport._id,
+            updates,
+            { new: true }
+          );
+
+          newUpdates.save();
+          return newUpdates.populate("conference");
+        } else {
+          const newSport = new Sport({
+            name,
+          });
+
+          await newSport.save();
+          console.log(`Success: ${newSport}`);
+          return newSport;
+        }
       } catch (err) {
-        console.error(err.message);
-        throw new Error(`Error saving new sport`);
+        console.error("Errors:", err);
+        throw new Error(`Unable to create new Sport`);
       }
     },
 
