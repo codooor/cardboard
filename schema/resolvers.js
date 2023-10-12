@@ -190,15 +190,15 @@ const resolvers = {
 
           console.log(updatedConference);
           return updatedConference.populate("sport");
+        } else {
+          const newConference = new Conference({
+            name,
+            sportId: sportId,
+          });
+
+          await newConference.save();
+          return newConference.populate("sport");
         }
-
-        const newConference = new Conference({
-          name,
-          sport: sportId,
-        });
-
-        await newConference.save();
-        return newConference;
       } catch (err) {
         console.error("Error Message:", err);
         throw new Error(`Unable to create new conference`);
