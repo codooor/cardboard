@@ -1,3 +1,4 @@
+import { config } from "dotenv";
 import {
   Brand,
   Athlete,
@@ -6,6 +7,7 @@ import {
   Card,
   Team,
   Division,
+  Conference,
 } from "../models/Cards.js";
 
 // CardSet
@@ -149,23 +151,72 @@ const resolvers = {
 
       try {
         await newSport.save();
-        return newSport; // Return the newly created sport
+        return newSport;
       } catch (err) {
         console.error(err.message);
         throw new Error(`Error saving new sport`);
       }
     },
 
-    addNewDivision: async (_, { division }) => {
+    addNewConference: async (_, { name, sportId }) => {
       try {
-        const newDivision = new Division({
-          division,
+        let existingConference = await Conference.findOne({ name: name });
+
+        if (existingConference) {
+          console.log(
+            `Conference: ${existingConference.name} already populated. Update fields.`
+          );
+
+          // If sport is not an array, simply set the value
+          const updates = {
+            sport: sportId,
+          };
+
+          // Update the existing conference
+          const newUpdates = await Conference.findByIdAndUpdate(
+            existingConference._id,
+            updates,
+            {
+              new: true,
+            }
+          );
+
+          await newUpdates.save();
+
+          // Fetch the updated conference
+          const updatedConference = await Conference.findById(
+            existingConference._id
+          );
+
+          console.log(updatedConference);
+          return updatedConference.populate("sport");
+        }
+
+        const newConference = new Conference({
+          name,
+          sport: sportId,
         });
 
-        return newDivision.populate("teams");
+        await newConference.save();
+        return newConference;
       } catch (err) {
-        console.error(err.message);
-        throw new Error("Unable to create new divison");
+        console.error("Error Message:", err);
+        throw new Error(`Unable to create new conference`);
+      }
+    },
+
+    addNewDivision: async (_, { name }) => {
+      try {
+        const newDivision = new Division({
+          name,
+        });
+
+        await newDivision.save();
+
+        return newDivision;
+      } catch (err) {
+        console.error("Error:", err);
+        throw new Error("Unable to create new division");
       }
     },
 

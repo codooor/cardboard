@@ -22,21 +22,23 @@ const teamSchema = new Schema({
   name: String,
   sport: { type: Schema.Types.ObjectId, ref: "Sport" },
   division: { type: Schema.Types.ObjectId, ref: "Division" },
+  conference: { type: Schema.Types.ObjectId, ref: "Conference" },
 });
 
 const Team = mongoose.model("Team", teamSchema);
 
-const leagueDivisionSchema = new Schema({
-  division: String,
+const divisionSchema = new Schema({
+  name: String,
   teams: [{ type: Schema.Types.ObjectId, ref: "Team" }],
 });
 
-const Division = mongoose.model("Division", leagueDivisionSchema);
+const Division = mongoose.model("Division", divisionSchema);
 
 const conferenceSchema = new Schema({
   name: String,
-  teams: [{ type: Schema.Types.ObjectId, ref: "Team" }],
+  sport: { type: Schema.Types.ObjectId, ref: "Sport" },
   divisions: [{ type: Schema.Types.ObjectId, ref: "Division" }],
+  teams: [{ type: Schema.Types.ObjectId, ref: "Team" }],
 });
 
 const Conference = mongoose.model("Conference", conferenceSchema);

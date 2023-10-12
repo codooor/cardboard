@@ -10,17 +10,22 @@ const typeDefs = gql`
     id: ID!
     name: String!
     sport: Sport
+    division: Division
+    conference: Conference
   }
 
   type Division {
-    division: String!
+    id: ID!
+    name: String!
     teams: [Team]
   }
 
   type Conference {
+    id: ID!
     name: String!
-    teams: [Team]
+    sport: Sport
     divisions: [Division]
+    teams: [Team]
   }
 
   type Athlete {
@@ -79,8 +84,7 @@ const typeDefs = gql`
     addNewSport(name: String!): Sport
 
     addNewConference(name: String!, sportId: ID!): Conference
-
-    addNewDivision(division: String!, conferenceId: ID!): Division
+    addNewDivision(name: String!): Division
 
     addNewTeam(
       name: String!
@@ -88,6 +92,8 @@ const typeDefs = gql`
       conferenceId: ID!
       divisionId: ID!
     ): Team
+
+    addDivision(name: String!): Division
 
     addNewBrand(name: String!): Brand
 
