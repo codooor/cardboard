@@ -84,11 +84,15 @@ const typeDefs = gql`
 
   type Mutation {
     createSport(name: String!): Sport
+    createConference(name: String!): Conference
+    createDivision(name: String!): Division
 
     addTeamsToSport(sportId: ID!, teamIds: [ID!]!): Sport
-
     addConferenceToSport(sportId: ID!, conferenceIds: [ID!]!): Sport
-    addNewDivision(name: String!): Division
+    addDivisionsToConferences(
+      conferenceId: ID!
+      divisionIds: [ID!]!
+    ): Conference
 
     addNewTeam(
       name: String!

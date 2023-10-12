@@ -49,7 +49,7 @@ const athleteSchema = new Schema({
   firstname: String,
   lastname: String,
   number: Number,
-  team: String,
+  team: { type: Schema.Types.ObjectId, ref: "Team" },
   position: String,
   sport: { type: Schema.Types.ObjectId, ref: "Sport" },
   cards: [{ type: Schema.Types.ObjectId, ref: "Card" }],

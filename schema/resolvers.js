@@ -171,6 +171,34 @@ const resolvers = {
       }
     },
 
+    createConference: async (_, { name }) => {
+      try {
+        const newConference = new Conference({ name });
+
+        await newConference.save();
+
+        console.log(`Success: ${newConference}`);
+        return newConference;
+      } catch (err) {
+        console.error("Error:", err);
+        throw new Error(`Cannot create new conference`);
+      }
+    },
+
+    createDivision: async (_, { name }) => {
+      try {
+        const newDivision = new Division({ name });
+
+        await newDivision.save();
+
+        console.log(`Success: ${newDivision}`);
+        return newDivision;
+      } catch (err) {
+        console.error("Error:", err);
+        throw new Error(`Cannot create new division`);
+      }
+    },
+
     addTeamsToSport: async (_, { sportId, teamIds }) => {
       try {
         const sport = await Sport.findById(sportId);
