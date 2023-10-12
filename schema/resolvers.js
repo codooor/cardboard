@@ -19,7 +19,9 @@ const resolvers = {
 
     getAllSports: async () => {
       try {
-        return await Sport.find();
+        const allSports = await Sport.find().populate("conferences");
+
+        return allSports;
       } catch (err) {
         console.error(err.message);
         throw new Error("Failed to fetch sports.");
@@ -31,6 +33,17 @@ const resolvers = {
       } catch (err) {
         console.error(err.message);
         throw new Error(`Failed to fetch sport with ID ${id}.`);
+      }
+    },
+
+    getConferences: async () => {
+      try {
+        const allConferences = await Conference.find().populate("sport");
+
+        return allConferences;
+      } catch (err) {
+        console.error("Error:", err);
+        throw new Error(`Cannot get conferences at this time`);
       }
     },
 
@@ -144,38 +157,36 @@ const resolvers = {
   Mutation: {
     // POST:
 
-    addNewSport: async (_, { name, conferenceId }) => {
+    createSport: async (_, { name }) => {
       try {
-        const existingSport = await Sport.findOne({ name: name });
+        const newSport = new Sport({ name });
 
-        if (existingSport) {
-          const updates = {
-            conference: conferenceId,
-          };
-          console.log(
-            `Sport exists with name ${existingSport.name}. Update fields`
-          );
+        await newSport.save();
 
-          const newUpdates = await Sport.findByIdAndUpdate(
-            existingSport._id,
-            updates,
-            { new: true }
-          );
-
-          newUpdates.save();
-          return newUpdates.populate("conference");
-        } else {
-          const newSport = new Sport({
-            name,
-          });
-
-          await newSport.save();
-          console.log(`Success: ${newSport}`);
-          return newSport;
-        }
+        console.log("Success", newSport);
+        return newSport;
       } catch (err) {
         console.error("Errors:", err);
         throw new Error(`Unable to create new Sport`);
+      }
+    },
+
+    addTeamsToSport: async (_, { sportId, teamIds }) => {
+      try {
+        const sport = await Sport.findById(sportId);
+        if (!sport) {
+          throw new Error(`No sport with ID: ${sportId}`);
+        }
+        sport.teams.push(...teamIds);
+        await sport.save();
+
+        console.log("Success:", sport);
+        return sport;
+      } catch (err) {
+        console.error("Error:", err);
+        throw new Error(
+          `Cannot add teams with Ids: ${teamId} to sport with ID: ${sportId}`
+        );
       }
     },
 

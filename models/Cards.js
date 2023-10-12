@@ -14,6 +14,7 @@ const sportSchema = new Schema({
     required: true,
     unique: true,
   },
+  conferences: [{ type: Schema.Types.ObjectId, ref: "Conference" }],
 });
 
 const Sport = mongoose.model("Sport", sportSchema);

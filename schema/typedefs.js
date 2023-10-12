@@ -78,10 +78,14 @@ const typeDefs = gql`
 
     getAllAthlete: [Athlete]
     getAthleteById(id: ID!): Athlete
+
+    getConferences: [Conference]
   }
 
   type Mutation {
-    addNewSport(name: String!): Sport
+    createSport(name: String!): Sport
+
+    addTeamsToSport(sportId: ID!, teamIds: [ID!]!): Sport
 
     addNewConference(name: String!, sportId: ID!): Conference
     addNewDivision(name: String!): Division
