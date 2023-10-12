@@ -190,47 +190,19 @@ const resolvers = {
       }
     },
 
-    addNewConference: async (_, { name, sportId }) => {
+    addConferenceToSport: async (_, { sportId, conferenceIds }) => {
       try {
-        let existingConference = await Conference.findOne({ name: name });
+        const sport = await Sport.findById(sportId);
 
-        if (existingConference) {
-          console.log(
-            `Conference: ${existingConference.name} already populated. Update fields.`
-          );
-
-          // If sport is not an array, simply set the value
-          const updates = {
-            sport: sportId,
-          };
-
-          // Update the existing conference
-          const newUpdates = await Conference.findByIdAndUpdate(
-            existingConference._id,
-            updates,
-            {
-              new: true,
-            }
-          );
-
-          await newUpdates.save();
-
-          // Fetch the updated conference
-          const updatedConference = await Conference.findById(
-            existingConference._id
-          );
-
-          console.log(updatedConference);
-          return updatedConference.populate("sport");
-        } else {
-          const newConference = new Conference({
-            name,
-            sportId: sportId,
-          });
-
-          await newConference.save();
-          return newConference.populate("sport");
+        if (!sport) {
+          throw new Error(`No sports with ID: ${sportId}`);
         }
+
+        sport.conferences.push(...conferenceIds);
+        await sport.save();
+
+        console.log("Success:", sport);
+        return sport;
       } catch (err) {
         console.error("Error Message:", err);
         throw new Error(`Unable to create new conference`);
