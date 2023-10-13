@@ -17,14 +17,15 @@ const resolvers = {
   Query: {
     // GET:
 
-    getAllSports: async () => {
+    returnSports: async () => {
       try {
-        const allSports = await Sport.find().populate("conferences");
+        const sports = await Sport.find().populate("conferences");
 
-        return allSports;
+        console.log(`Success: ${sports}`);
+        return sports;
       } catch (err) {
-        console.error(err.message);
-        throw new Error("Failed to fetch sports.");
+        console.error(`Errors: ${err}`);
+        throw new Error("Failed to retrieve sports.");
       }
     },
     getSportById: async (_, { id }) => {
@@ -36,14 +37,27 @@ const resolvers = {
       }
     },
 
-    getConferences: async () => {
+    returnConferences: async () => {
       try {
-        const allConferences = await Conference.find().populate("sport");
+        const conferences = await Conference.find().populate("sport");
 
-        return allConferences;
+        console.log(`Success: ${conferences}`);
+        return conferences;
       } catch (err) {
-        console.error("Error:", err);
+        console.error(`Errors: ${err}`);
         throw new Error(`Cannot get conferences at this time`);
+      }
+    },
+
+    returnDivisions: async () => {
+      try {
+        const divisions = await Division.find();
+
+        console.log(`Success: ${divisions}`);
+        return divisions;
+      } catch (err) {
+        console.error(`Errors: ${err}`);
+        throw new Error(`Unable to retrieve divisions`);
       }
     },
 
@@ -230,25 +244,10 @@ const resolvers = {
         await sport.save();
 
         console.log("Success:", sport);
-        return sport;
+        return sport.populate("conferences");
       } catch (err) {
         console.error("Error Message:", err);
         throw new Error(`Unable to create new conference`);
-      }
-    },
-
-    addNewDivision: async (_, { name }) => {
-      try {
-        const newDivision = new Division({
-          name,
-        });
-
-        await newDivision.save();
-
-        return newDivision;
-      } catch (err) {
-        console.error("Error:", err);
-        throw new Error("Unable to create new division");
       }
     },
 

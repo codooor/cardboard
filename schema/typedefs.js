@@ -4,6 +4,7 @@ const typeDefs = gql`
   type Sport {
     id: ID!
     name: String!
+    conferences: [Conference]
   }
 
   type Team {
@@ -61,7 +62,7 @@ const typeDefs = gql`
   }
 
   type Query {
-    getAllSports: [Sport]
+    returnSports: [Sport]
     getSportById(id: ID!): Sport
 
     getAllTeams: [Team]
@@ -79,7 +80,8 @@ const typeDefs = gql`
     getAllAthlete: [Athlete]
     getAthleteById(id: ID!): Athlete
 
-    getConferences: [Conference]
+    returnDivisions: [Division]
+    returnConferences: [Conference]
   }
 
   type Mutation {
@@ -89,6 +91,7 @@ const typeDefs = gql`
 
     addTeamsToSport(sportId: ID!, teamIds: [ID!]!): Sport
     addConferenceToSport(sportId: ID!, conferenceIds: [ID!]!): Sport
+
     addDivisionsToConferences(
       conferenceId: ID!
       divisionIds: [ID!]!
