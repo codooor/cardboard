@@ -185,6 +185,24 @@ const resolvers = {
       }
     },
 
+    removeSport: async (_, { sportId }) => {
+      try {
+        const sport = await Sport.findById(sportId);
+
+        if (!sport) {
+          throw new Error(`No sport with ID: ${sportId}`);
+        } else {
+          const removeSport = await Sport.findByIdAndDelete(sportId);
+          console.log(`Successful Removal: ${removeSport}`);
+
+          return removeSport;
+        }
+      } catch (err) {
+        console.error(`Errors: ${err}`);
+        throw new Error(`Cannot remove sport with ID: ${sportId}`);
+      }
+    },
+
     createConference: async (_, { name }) => {
       try {
         const newConference = new Conference({ name });
@@ -244,10 +262,42 @@ const resolvers = {
         await sport.save();
 
         console.log("Success:", sport);
-        return sport.populate("conferences");
+
+        await sport.populate("conferences");
+
+        console.log(`Successfully added Conference to sport: ${sport}`);
+        return sport;
       } catch (err) {
         console.error("Error Message:", err);
-        throw new Error(`Unable to create new conference`);
+        throw new Error(
+          `Unable to add conference: ${conferenceIds} to sport: ${sportId}`
+        );
+      }
+    },
+
+    removeConferenceFromSport: async (_, { sportId, conferenceId }) => {
+      try {
+        const sport = await Sport.findById(sportId);
+
+        if (!sport) {
+          throw new Error(`No sport with ID: ${sportId}`);
+        } else {
+          console.log(`Sport ${sport.name} found: Remove Conference`);
+
+          const index = sport.conferences.indexOf(conferenceId);
+          if (index > -1) {
+            sport.conferences.splice(index, 1);
+            await sport.save();
+          }
+
+          console.log(`Successfully removed Conference: ${sport}`);
+          return sport.populate("conferences");
+        }
+      } catch (err) {
+        console.error(`Errors: ${err}`);
+        throw new Error(
+          `Unable to remove Conference from Sport with ID: ${sportId}`
+        );
       }
     },
 

@@ -89,6 +89,9 @@ const typeDefs = gql`
     createConference(name: String!): Conference
     createDivision(name: String!): Division
 
+    removeSport(sportId: ID!): Sport
+    removeConferenceFromSport(sportId: ID!, conferenceId: ID!): Sport
+
     addTeamsToSport(sportId: ID!, teamIds: [ID!]!): Sport
     addConferenceToSport(sportId: ID!, conferenceIds: [ID!]!): Sport
 
